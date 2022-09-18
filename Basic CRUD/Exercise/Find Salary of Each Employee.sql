@@ -1,0 +1,1 @@
+select `first_name`,`last_name`, `salary` from `employees` ORDER BY `employee_id` ;
