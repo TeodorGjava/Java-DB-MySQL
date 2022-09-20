@@ -1,0 +1,1 @@
+SELECT title FROM books where title like('The%');
