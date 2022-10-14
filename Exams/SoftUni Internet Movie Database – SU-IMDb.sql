@@ -1,3 +1,4 @@
+use softuni_imdb;
 create table `genres`(
 `id` int primary key auto_increment,
 `name` varchar(50) not null unique);
@@ -117,17 +118,33 @@ else "-"end as subtitles, budget from movies m join movies_additional_info mi
 on m.movie_info_id=mi.id
 order by mi.budget desc;
 
-
+#10
 DELIMITER $$
 create function  udf_actor_history_movies_count(full_name VARCHAR(50)) 
 returns int
 deterministic
 begin
 declare result int;
-set result := (select count(*) from actors a join movies_actors ma 
-on a.id = ma.actor_id having 
-where concat(a.first_name," ",a.last_name) = full_name
-and );
+set result := (select count(g.name) as 'history_movies'
+from actors a 
+join movies_actors ma on a.id = ma.actor_id
+join genres_movies gm on ma.movie_id=gm.movie_id
+join genres g on g.id=gm.genre_id
+where g.name = "History" and full_name = concat(a.first_name, " ", a.last_name)
+group by g.name);
 return result;
 end$$
 select udf_actor_history_movies_count('Stephan Lundberg') as 'history_movies'$$
+#12
+ create procedure udp_award_movie(movie_title varchar(50))
+ begin
+	update actors a
+    join movies_actors ma on a.id = ma.actor_id
+    join movies m on ma.movie_id = m.id
+    set a.awards = a.awards+1
+    where m.title = movie_title;
+ end
+ 
+ 
+ 
+ 
